@@ -42,22 +42,24 @@ int main(int argc, char *argv[]) {
 int check_commands() {
     char *h=(char *)malloc(sizeof(char *)*256);
 
-    if(strstr(strncpy(h,mycmd,256),"exit")) {
+    if(strstr(strncpy(h,mycmd,4),"exit")) {
         works=0;
     }
     else
-    if(strstr(strncpy(h,mycmd,256),"help")) {
+    if(strstr(strncpy(h,mycmd,4),"help")) {
         if(strlen(mycmd)>4) {
             if(strstr(strcpy(h,mycmd+4),"help")) puts("HELP [command] - shows every available command or shows help about argumented command.");
             if(strstr(strcpy(h,mycmd+4),"dir")) puts("DIR [directory] - shows every file and directory in current dir (if no arguments) and in argumented directory if it exists.");
             if(strstr(strcpy(h,mycmd+4),"cd")) puts("CD [directory] - changes current directory or clears it if no arguments written.");
             if(strstr(strcpy(h,mycmd+4),"exit")) puts("EXIT - exits program.");
             if(strstr(strcpy(h,mycmd+4),"echo")) puts("ECHO [text] - outputs text on the screen.");
+            if(strstr(strcpy(h,mycmd+4),".")) puts(". [program]- executes argumented file if it exists.");
+            if(strstr(strcpy(h,mycmd+4),"start")) puts("START [program] - executes argumented file if it exists.");
         } else
-        puts("HELP:\necho - prints a text on the screen\nhelp - shows help\nexit - exit program\ndir - show directory's files\ncd - change current dir");
+        puts("HELP:\necho - prints a text on the screen\nhelp - shows help\nexit - exit program\ndir - show directory's files\ncd - change current dir\n. - execute file\nstart - execute file");
     }
     else
-    if(strstr(strncpy(h,mycmd,256),"echo")) {
+    if(strstr(strncpy(h,mycmd,4),"echo")) {
             if(strlen(mycmd)>5) {
                 char *echo=(char *)malloc(sizeof(char *)*256);
                 printf("%s\n",strcpy(echo,mycmd+5));
@@ -68,8 +70,11 @@ int check_commands() {
         if(strlen(mycmd)>4) {
             if(strstr(strncpy(h,strchr(mycmd,' '),256),"-a")) {
 
-                char *dirname=(char *)malloc(512);
-                    strncpy(dirname,mycmd+7,256-7);
+            char *dirname=(char *)malloc(512);
+                if(strstr(strcpy(h,mycmd+7),curdrive)==0) {
+                    strcpy(dirname,curdrive);
+                    strcat(dirname,mycmd+7);
+                } else strcpy(dirname,mycmd+7);
 
                 DIR *dir;
                 struct dirent *ddir;
@@ -83,10 +88,10 @@ int check_commands() {
                 } else {printf("No directory exists: %s\n",strncpy(h,mycmd+7,256-7));}
             } else {
             char *dirname=(char *)malloc(512);
-                if(strstr(strncpy(h,mycmd+4,256-4),curdrive)) {
+                if(strstr(strcpy(h,mycmd+4),curdrive)==0) {
                     strcpy(dirname,curdrive);
                     strcat(dirname,mycmd+4);
-                } else strncpy(dirname,mycmd+4,256-4);
+                } else strcpy(dirname,mycmd+4);
 
             DIR *dir;
             struct dirent *ddir;
@@ -95,7 +100,7 @@ int check_commands() {
                 while((ddir=readdir(dir))!=NULL) {
                     float filesize=-1;
                     WIN32_FILE_ATTRIBUTE_DATA attr;
-                    char *fname=malloc(256);
+                    char *fname=malloc(1024);
                         strcpy(fname,dirname);
                         strcat(fname,ddir->d_name);
                     int len=MultiByteToWideChar(CP_UTF8,0,fname,-1,NULL,0);
@@ -127,8 +132,10 @@ int check_commands() {
             DIR *dir;
             struct dirent *ddir;
             char *mydirr=(char *)malloc(512);
-                strcpy(mydirr,curdrive);
-                strcat(mydirr,curdir);
+                if(strstr(strcpy(h,mycmd+4),curdrive)==0) {
+                    strcpy(mydirr,curdrive);
+                    strcat(mydirr,mycmd+4);
+                } else strcpy(mydirr,mycmd+4);
             dir=opendir(mydirr);
             if(dir) {
                 while((ddir=readdir(dir))!=NULL) {
@@ -169,11 +176,29 @@ int check_commands() {
     else if(strstr(strncpy(h,mycmd,strlen("clear")),"clear")) {
         system("cls");
     }
-    else if(strstr(strncpy(h,mycmd,256),"cd")) {
+    else if(strstr(strncpy(h,mycmd,2),"cd")) {
         if(strlen(mycmd)>2) {
         strcat(curdir,strcpy(h,mycmd+3));
         if(strstr(strcpy(h,mycmd+3),"\\")==0) strcat(curdir,"\\");
         } else strcpy(curdir,"");
+    }
+    else if(strstr(strncpy(h,mycmd,1),".")&&strlen(mycmd)>2) {
+        char *myname=(char *)malloc(256);
+            strcpy(myname,"start ");
+            if(strstr(mycmd,curdrive)==0) {strcat(myname,curdrive);strcat(myname,curdir);}
+            strcat(myname,strcpy(h,mycmd+2));
+
+        system(myname);
+        free(myname);
+    }
+    else if(strstr(strncpy(h,mycmd,5),"start")&&strlen(mycmd)>6) {
+        char *myname=(char *)malloc(256);
+            strcpy(myname,"start ");
+            if(strstr(mycmd,curdrive)==0) {strcat(myname,curdrive);strcat(myname,curdir);}
+            strcat(myname,strcpy(h,mycmd+6));
+
+        system(myname);
+        free(myname);
     }
 
     else printf("Invalid command: %s\n",mycmd);
