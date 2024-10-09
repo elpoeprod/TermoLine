@@ -8,8 +8,9 @@
 #include <stdlib.h>
 #include <windows.h>
 #include <dirent.h>
+#include <xlocale.h>
 
-char *strcasestr(const char *haystack, const char *needle);
+#define strcasestr(str1,str2) strcasestr_l(str1,str2,(locale_t)loc)
 
 char *mycmd;
 int works=1;
