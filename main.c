@@ -2,15 +2,17 @@
         TermoLine - by elpoep
         @ 2024
 */
-#include <math.h>
+
+#define _GNU_SOURCE
+
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 #include <windows.h>
 #include <dirent.h>
-#include <xlocale.h>
+//#include <xlocale.h>
 
-#define strcasestr(str1,str2) strcasestr_l(str1,str2,(locale_t)loc)
+//#define strcasestr(str1,str2) strcasestr_l(str1,str2,(locale_t)loc)
 
 char *mycmd;
 int works=1;
